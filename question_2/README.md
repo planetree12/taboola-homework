@@ -34,6 +34,11 @@ Code changes tested with Java OpenJDK Runtime Environment Temurin-21.0.7+6 (buil
    - Issue: Date is mutable and could be accidentally modified
    - Solution: Use immutable Instant to replace Date
 
+7. **Bad naming practice**
+
+   - Issue: Fields used the `m_` prefix (Hungarian notation), which is outdated and inconsistent with modern Java conventions
+   - Solution: Renamed all fields to follow standard Java naming conventions, removing the `m_` prefix
+
 ## Testing
 
 1. Compile the code:

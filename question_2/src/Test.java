@@ -5,17 +5,17 @@ import java.util.Objects;
 import java.time.Instant;
 
 public class Test {
-  private Instant m_time;
-  private String m_name;
-  private LinkedHashSet<Integer> m_numbers;
-  private LinkedHashSet<String> m_strings;
+  private Instant time;
+  private String name;
+  private LinkedHashSet<Integer> numbers;
+  private LinkedHashSet<String> strings;
 
   public Test(Date time, String name, List<Integer> numbers,
       List<String> strings) {
-    m_time = time != null ? time.toInstant() : null;
-    m_name = name;
-    m_numbers = numbers != null ? new LinkedHashSet<Integer>(numbers) : new LinkedHashSet<>();
-    m_strings = strings != null ? new LinkedHashSet<String>(strings) : new LinkedHashSet<>();
+    this.time = time != null ? time.toInstant() : null;
+    this.name = name;
+    this.numbers = numbers != null ? new LinkedHashSet<Integer>(numbers) : new LinkedHashSet<>();
+    this.strings = strings != null ? new LinkedHashSet<String>(strings) : new LinkedHashSet<>();
   }
 
   @Override
@@ -30,18 +30,18 @@ public class Test {
 
     Test other = (Test) obj;
 
-    if (!Objects.equals(m_name, other.m_name))
+    if (!Objects.equals(name, other.name))
       return false;
 
-    if (!Objects.equals(m_time, other.m_time))
+    if (!Objects.equals(time, other.time))
       return false;
 
     // Convert LinkedHashSet to List to preserve order for comparison
-    if (orderedHashCode(m_numbers) != orderedHashCode(other.m_numbers))
+    if (orderedHashCode(numbers) != orderedHashCode(other.numbers))
       return false;
 
     // Same comparison for m_strings
-    if (orderedHashCode(m_strings) != orderedHashCode(other.m_strings))
+    if (orderedHashCode(strings) != orderedHashCode(other.strings))
       return false;
 
     return true;
@@ -53,12 +53,12 @@ public class Test {
     int result = 1;
 
     // Basic property hashCode
-    result = prime * result + Objects.hashCode(m_name);
-    result = prime * result + Objects.hashCode(m_time);
+    result = prime * result + Objects.hashCode(name);
+    result = prime * result + Objects.hashCode(time);
 
     // Calculate hashCode for LinkedHashSet (preserving order impact)
-    result = prime * result + orderedHashCode(m_numbers);
-    result = prime * result + orderedHashCode(m_strings);
+    result = prime * result + orderedHashCode(numbers);
+    result = prime * result + orderedHashCode(strings);
 
     return result;
   }
@@ -67,27 +67,27 @@ public class Test {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("Test[");
-    sb.append("name=").append(m_name);
-    sb.append(", time=").append(m_time);
-    sb.append(", numbers=").append(m_numbers);
-    sb.append(", strings=").append(m_strings);
+    sb.append("name=").append(name);
+    sb.append(", time=").append(time);
+    sb.append(", numbers=").append(numbers);
+    sb.append(", strings=").append(strings);
     sb.append("]");
     return sb.toString();
   }
 
   public void removeString(String str) {
-    m_strings.remove(str);
+    strings.remove(str);
   }
 
   public boolean containsNumber(int number) {
-    return m_numbers.contains(number);
+    return numbers.contains(number);
   }
 
   public boolean isHistoric() {
-    if (m_time == null) {
+    if (time == null) {
       return false;
     }
-    return m_time.toEpochMilli() < System.currentTimeMillis();
+    return time.toEpochMilli() < System.currentTimeMillis();
   }
 
   // To prevent creating a new List when calling `equals` or `hashCode`, we can
