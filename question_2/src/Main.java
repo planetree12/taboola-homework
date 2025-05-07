@@ -11,7 +11,7 @@ public class Main {
     Date testDate = new Date();
     String testName = "Test Instance";
     List<Integer> testNumbers = new ArrayList<>(List.of(1, 2, 3, 4, 5));
-    List<String> testStrings = new ArrayList<>(List.of("apple", "banana", "cherry"));
+    List<String> testStrings = new ArrayList<>(List.of("a", "b", "c"));
 
     Test testInstance = new Test(testDate, testName, testNumbers, testStrings);
 
@@ -32,48 +32,45 @@ public class Main {
     System.out.println("Contains number 999: " + testInstance.containsNumber(999));
 
     // Test removeString
-    System.out.println("Before removing 'banana': " + testInstance);
-    testInstance.removeString("banana");
-    System.out.println("After removing 'banana': " + testInstance);
+    System.out.println("Before removing 'b': " + testInstance);
+    testInstance.removeString("b");
+    System.out.println("After removing 'b': " + testInstance);
     System.out.println();
 
     // === Test 3: Equals Method ===
     System.out.println("Test 3: Equals Method");
 
-    // For testing, create date objects with shared reference
     Date sharedDate = new Date();
+    Date differentDate = new Date();
+    differentDate.setTime(0);
 
     Test base = new Test(
-        sharedDate, // Use the same timestamp
-        "Test Instance",
+        sharedDate,
+        testName,
         new ArrayList<>(List.of(1, 2, 3, 4, 5)),
-        new ArrayList<>(List.of("apple", "cherry")));
+        new ArrayList<>(List.of("a", "c")));
 
-    // Create completely identical objects
     Test identical = new Test(
-        sharedDate, // Use the same timestamp
-        "Test Instance",
+        sharedDate,
+        testName,
         new ArrayList<>(List.of(1, 2, 3, 4, 5)),
-        new ArrayList<>(List.of("apple", "cherry")));
+        new ArrayList<>(List.of("a", "c")));
 
-    // Create objects with same content but different order
     Test sameContentDifferentOrder = new Test(
-        sharedDate, // Use the same timestamp
-        "Test Instance",
-        new ArrayList<>(List.of(5, 4, 3, 2, 1)), // Reversed order
-        new ArrayList<>(List.of("cherry", "apple")) // Reversed order
-    );
+        sharedDate,
+        testName,
+        new ArrayList<>(List.of(5, 4, 3, 2, 1)),
+        new ArrayList<>(List.of("c", "a")));
 
-    // Create objects with different content
-    Test differentContent = new Test(
-        sharedDate, // Use the same timestamp
-        "Different Name",
-        new ArrayList<>(List.of(1, 2, 3)),
-        new ArrayList<>(List.of("apple", "cherry")));
+    Test differentDateContent = new Test(
+        differentDate,
+        testName,
+        new ArrayList<>(List.of(1, 2, 3, 4, 5)),
+        new ArrayList<>(List.of("a", "c")));
 
     System.out.println("Same content, same order equals: " + base.equals(identical));
     System.out.println("Same content, different order equals: " + base.equals(sameContentDifferentOrder));
-    System.out.println("Different content equals: " + base.equals(differentContent));
+    System.out.println("Different content equals: " + base.equals(differentDateContent));
     System.out.println();
 
     // === Test 4: HashCode Method ===
@@ -81,7 +78,7 @@ public class Main {
     System.out.println("Base instance hashCode: " + base.hashCode());
     System.out.println("Identical instance hashCode: " + identical.hashCode());
     System.out.println("Different order instance hashCode: " + sameContentDifferentOrder.hashCode());
-    System.out.println("Different content instance hashCode: " + differentContent.hashCode());
+    System.out.println("Different content instance hashCode: " + differentDateContent.hashCode());
     System.out.println();
 
     // === Test 5: isHistoric Method ===

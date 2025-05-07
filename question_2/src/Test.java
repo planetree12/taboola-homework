@@ -20,12 +20,14 @@ public class Test {
 
   @Override
   public boolean equals(Object obj) {
-    // Check reference equality
+    if (obj == null) {
+      return false;
+    }
+
     if (this == obj)
       return true;
 
-    // Check null and type
-    if (obj == null || getClass() != obj.getClass())
+    if (this.getClass() != obj.getClass())
       return false;
 
     Test other = (Test) obj;
@@ -36,11 +38,9 @@ public class Test {
     if (!Objects.equals(time, other.time))
       return false;
 
-    // Convert LinkedHashSet to List to preserve order for comparison
     if (orderedHashCode(numbers) != orderedHashCode(other.numbers))
       return false;
 
-    // Same comparison for m_strings
     if (orderedHashCode(strings) != orderedHashCode(other.strings))
       return false;
 
@@ -56,7 +56,7 @@ public class Test {
     result = prime * result + Objects.hashCode(name);
     result = prime * result + Objects.hashCode(time);
 
-    // Calculate hashCode for LinkedHashSet (preserving order impact)
+    // Calculate hashCode for LinkedHashSet (preserving element order)
     result = prime * result + orderedHashCode(numbers);
     result = prime * result + orderedHashCode(strings);
 
@@ -91,7 +91,8 @@ public class Test {
   }
 
   // To prevent creating a new List when calling `equals` or `hashCode`, we can
-  // use this helper function
+  // use this helper function to calculate the hash code of a LinkedHashSet
+  // preserving the order of the elements.
   private <T> int orderedHashCode(LinkedHashSet<T> set) {
     int result = 1;
     for (T element : set) {
