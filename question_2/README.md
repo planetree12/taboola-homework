@@ -1,6 +1,10 @@
 # Question 2
 
-Code changes tested with Java OpenJDK Runtime Environment Temurin-21.0.7+6 (build 21.0.7+6-LTS)
+## Environment Requirements
+
+This program was written and tested by following environment:
+
+- OpenJDK Runtime Environment Temurin-21.0.7+6 (build 21.0.7+6-LTS)
 
 ## Issues and Solutions
 
