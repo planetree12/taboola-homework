@@ -2,13 +2,9 @@ package jsonparser;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -274,11 +270,11 @@ class RecursiveJsonParserTest {
   @Test
   @DisplayName("Large JSON parsing")
   void testLargeJson() {
-    // Create an array with 100 objects
+    // Create an array with 1,000,000 objects
     StringBuilder largeJson = new StringBuilder("[\n");
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 1000000; i++) {
       largeJson.append("  {\"index\": ").append(i).append(", \"value\": \"Test\"");
-      if (i < 99) {
+      if (i < 999999) {
         largeJson.append("},\n");
       } else {
         largeJson.append("}\n");
@@ -290,7 +286,7 @@ class RecursiveJsonParserTest {
     assertThat(result).isInstanceOf(List.class);
     List<Object> list = (List<Object>) result;
 
-    assertThat(list).hasSize(100);
+    assertThat(list).hasSize(1000000);
 
     // Check first and last elements
     assertThat(list.get(0)).isInstanceOf(Map.class);
@@ -303,29 +299,107 @@ class RecursiveJsonParserTest {
     assertThat(lastItem).containsEntry("value", "Test");
   }
 
-  // Parameterized tests - test various invalid JSON
-  @ParameterizedTest(name = "Invalid JSON test: {0}")
-  @MethodSource("invalidJsonProvider")
-  void testInvalidJson(String testName, String invalidJson, String expectedError) {
+  @Test
+  @DisplayName("Invalid JSON - Incomplete JSON")
+  void testIncompleteJson() {
+    String invalidJson = "{\"key\": \"value\"";
     Exception exception = assertThrows(RuntimeException.class, () -> parser.parse(invalidJson));
-    assertThat(exception.getMessage()).contains(expectedError);
+    assertThat(exception.getMessage()).contains("Expected ',' or '}'");
   }
 
-  // Data source for invalid JSON test cases
-  private static Stream<Arguments> invalidJsonProvider() {
-    return Stream.of(
-        Arguments.of("Incomplete JSON", "{\"key\": \"value\"", "Expected ',' or '}'"),
-        Arguments.of("Missing quotation marks", "{key: \"value\"}", "Expected '\"'"),
-        Arguments.of("Invalid value format", "{\"key\": tru}", "Invalid boolean value"),
-        Arguments.of("Extra comma (object)", "{\"key\": \"value\",}", "Trailing comma"),
-        Arguments.of("Extra comma (array)", "[1, 2, 3,]", "Trailing comma"),
-        Arguments.of("Missing colon", "{\"key\" \"value\"}", "Expected ':'"),
-        Arguments.of("Missing value in object", "{\"key\":}", "Unexpected character: }"),
-        Arguments.of("Invalid character", "{\"key\": @}", "Unexpected character: @"),
-        Arguments.of("Unterminated string", "{\"key\": \"value}", "Unterminated string"),
-        Arguments.of("Extra characters", "{\"key\": \"value\"} extra", "Unexpected content"),
-        Arguments.of("Missing value in array", "[1, , 3]", "Unexpected character: ,"),
-        Arguments.of("Extra colon", "{\"key\":: \"value\"}", "Unexpected character"),
-        Arguments.of("Extra colon after value", "{\"key\": \"value\":}", "Expected"));
+  @Test
+  @DisplayName("Invalid JSON - Missing quotation marks")
+  void testMissingQuotationMarks() {
+    String invalidJson = "{key: \"value\"}";
+    Exception exception = assertThrows(RuntimeException.class, () -> parser.parse(invalidJson));
+    assertThat(exception.getMessage()).contains("Expected '\"'");
+  }
+
+  @Test
+  @DisplayName("Invalid JSON - Invalid value format")
+  void testInvalidValueFormat() {
+    String invalidJson = "{\"key\": tru}";
+    Exception exception = assertThrows(RuntimeException.class, () -> parser.parse(invalidJson));
+    assertThat(exception.getMessage()).contains("Invalid boolean value");
+  }
+
+  @Test
+  @DisplayName("Invalid JSON - Extra comma in object")
+  void testExtraCommaInObject() {
+    String invalidJson = "{\"key\": \"value\",}";
+    Exception exception = assertThrows(RuntimeException.class, () -> parser.parse(invalidJson));
+    assertThat(exception.getMessage()).contains("Trailing comma");
+  }
+
+  @Test
+  @DisplayName("Invalid JSON - Extra comma in array")
+  void testExtraCommaInArray() {
+    String invalidJson = "[1, 2, 3,]";
+    Exception exception = assertThrows(RuntimeException.class, () -> parser.parse(invalidJson));
+    assertThat(exception.getMessage()).contains("Trailing comma");
+  }
+
+  @Test
+  @DisplayName("Invalid JSON - Missing colon")
+  void testMissingColon() {
+    String invalidJson = "{\"key\" \"value\"}";
+    Exception exception = assertThrows(RuntimeException.class, () -> parser.parse(invalidJson));
+    assertThat(exception.getMessage()).contains("Expected ':'");
+  }
+
+  @Test
+  @DisplayName("Invalid JSON - Missing value in object")
+  void testMissingValueInObject() {
+    String invalidJson = "{\"key\":}";
+    Exception exception = assertThrows(RuntimeException.class, () -> parser.parse(invalidJson));
+    assertThat(exception.getMessage()).contains("Unexpected character: }");
+  }
+
+  @Test
+  @DisplayName("Invalid JSON - Invalid character")
+  void testInvalidCharacter() {
+    String invalidJson = "{\"key\": @}";
+    Exception exception = assertThrows(RuntimeException.class, () -> parser.parse(invalidJson));
+    assertThat(exception.getMessage()).contains("Unexpected character: @");
+  }
+
+  @Test
+  @DisplayName("Invalid JSON - Unterminated string")
+  void testUnterminatedString() {
+    String invalidJson = "{\"key\": \"value}";
+    Exception exception = assertThrows(RuntimeException.class, () -> parser.parse(invalidJson));
+    assertThat(exception.getMessage()).contains("Unterminated string");
+  }
+
+  @Test
+  @DisplayName("Invalid JSON - Extra characters")
+  void testExtraCharacters() {
+    String invalidJson = "{\"key\": \"value\"} extra";
+    Exception exception = assertThrows(RuntimeException.class, () -> parser.parse(invalidJson));
+    assertThat(exception.getMessage()).contains("Unexpected content");
+  }
+
+  @Test
+  @DisplayName("Invalid JSON - Missing value in array")
+  void testMissingValueInArray() {
+    String invalidJson = "[1, , 3]";
+    Exception exception = assertThrows(RuntimeException.class, () -> parser.parse(invalidJson));
+    assertThat(exception.getMessage()).contains("Unexpected character: ,");
+  }
+
+  @Test
+  @DisplayName("Invalid JSON - Extra colon")
+  void testExtraColon() {
+    String invalidJson = "{\"key\":: \"value\"}";
+    Exception exception = assertThrows(RuntimeException.class, () -> parser.parse(invalidJson));
+    assertThat(exception.getMessage()).contains("Unexpected character");
+  }
+
+  @Test
+  @DisplayName("Invalid JSON - Extra colon after value")
+  void testExtraColonAfterValue() {
+    String invalidJson = "{\"key\": \"value\":}";
+    Exception exception = assertThrows(RuntimeException.class, () -> parser.parse(invalidJson));
+    assertThat(exception.getMessage()).contains("Expected");
   }
 }

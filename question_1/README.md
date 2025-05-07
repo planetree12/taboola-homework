@@ -2,9 +2,11 @@
 
 ## Project Overview
 
-This is a Java implementation of a recursive descent JSON parser. The parser can convert standard JSON strings into Java objects, supporting all standard JSON data types (objects, arrays, strings, numbers, booleans, and null) and capable of handling complex nested structures and escape characters.
+This is a Java implementation of a JSON parser by using recursive descent approach. The parser follow [ECMA-404 The JSON Data Interchange Standard](https://www.json.org/json-en.html) and can convert standard JSON strings into Java objects, supporting all standard JSON data types (objects, arrays, strings, numbers, booleans, and null) and capable of handling nested structures and escape characters.
 
 ## Environment Requirements
+
+This program was written and tested by following environment:
 
 - OpenJDK Runtime Environment Temurin-21.0.7+6 (build 21.0.7+6-LTS)
 - Gradle 8.14
@@ -15,15 +17,6 @@ This is a Java implementation of a recursive descent JSON parser. The parser can
 - Gradle 8.14 (build tool)
 - JUnit Jupiter (testing framework)
 - AssertJ (assertion library)
-
-## Features
-
-- Supports parsing of all standard JSON data types
-- Handles nested object and array structures
-- Supports all escape characters in JSON strings
-- Processes scientific notation and high-precision numbers
-- Provides detailed error messages, including the position of invalid JSON
-- Capable of processing large JSON files and long strings
 
 ## Run Tests
 

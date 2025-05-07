@@ -128,7 +128,6 @@ public class RecursiveJsonParser {
       char c = json.charAt(position++);
 
       if (escaped) {
-        // Handle escape characters
         switch (c) {
           case '"':
             sb.append('"');
