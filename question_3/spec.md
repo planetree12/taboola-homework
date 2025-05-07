@@ -8,7 +8,7 @@ This specification defines a generic local cache with automatic data loading fro
 
 ### 2.1 Essential Features
 
-- **Automatic Loading**: When a requested key is not found, automatically invoke a user-provided loading function to retrieve data from external sources
+- **Automatic Loading**: When a requested key is not found, automatically trigger a user-provided loading function to retrieve data from external sources
 - **Generic Type Support**: Support for arbitrary key and value types
 - **Configurable Size Limits**: Prevent unbounded memory growth
 - **Expiration Policies**:
@@ -22,8 +22,7 @@ This specification defines a generic local cache with automatic data loading fro
 - **Bulk Loading**: Efficiently load multiple keys in a single operation
 - **Loading Failure Handling**: Configurable policies for handling exceptions during loading
 - **Refresh Mechanisms**: Proactive background refresh before expiration
-- **Write-Through Option**: Optionally propagate cache updates to the backing store
-- **Removal Listeners**: Notification mechanism when entries are removed
+- **Write-Through Option**: Optionally save cache updates to the backing store to make ultimate consistency
 
 ## 3. Usage Scenarios
 
@@ -44,7 +43,7 @@ This specification defines a generic local cache with automatic data loading fro
 ## 4. API Design
 
 ```java
-// Define a cache with loading functionality
+// Define a cache with loading capability
 AutoLoadCache<UserId, UserProfile> userCache = CacheManager.createCache()
     .withMaxSize(1000)
     .withExpiration(30, TimeUnit.MINUTES)
@@ -52,13 +51,51 @@ AutoLoadCache<UserId, UserProfile> userCache = CacheManager.createCache()
         // External data loading function
         return databaseService.fetchUserProfile(userId);
     })
+    .withWriteThrough((key, value) -> {
+        // Write-through function: save to backing store
+        databaseService.saveUserProfile(key, value);
+    })
     .build();
 
-// Automatically load when cache misses
+// Automatically load on cache miss
 UserProfile profile = userCache.get(userId);
 
-// Bulk loading operation
+// Bulk load operation
 Map<UserId, UserProfile> profiles = userCache.getAll(userIds);
+```
+
+### 4.1 Basic API Method Signatures
+
+```java
+// Puts the specified key-value pair into the cache
+void put(K key, V value);
+
+// Puts multiple key-value pairs into the cache in batch
+void putAll(Map<K, V> entries);
+
+// Invalidates the cache entry for the specified key
+void invalidate(K key);
+
+// Invalidates the cache entries for the specified keys
+void invalidateAll(Collection<K> keys);
+
+// Invalidates all cache entries
+void invalidateAll();
+
+// Checks if the cache contains the specified key (does not trigger loading)
+boolean containsKey(K key);
+
+// Returns the current number of entries in the cache
+int size();
+
+// Returns cache statistics (hit rate, load count, etc.)
+CacheStats stats();
+
+// Actively reloads the value for the specified key
+void refresh(K key);
+
+// Returns a read-only view of the cache contents
+Map<K, V> asMap();
 ```
 
 ## 5. Implementation Approach
@@ -85,7 +122,7 @@ Map<UserId, UserProfile> profiles = userCache.getAll(userIds);
 #### 5.2.2 Concurrency Handling
 
 - Use lock striping to minimize contention
-- Implement request coalescing to prevent duplicate loads of the same key
+- Implement request combination to prevent duplicate loads of the same key
 - Ensure atomic operations for compound actions
 
 #### 5.2.3 Eviction Strategy
@@ -98,7 +135,7 @@ Map<UserId, UserProfile> profiles = userCache.getAll(userIds);
 
 - **Loading Failures**: Cache exceptions or return default values based on configuration
 - **Retry Mechanism**: Optional configurable retry policy for transient failures
-- **Circuit Breaker**: Prevent cascade failures when backing store is unavailable
+- **Circuit Breaker**: Prevent chaining failures when backing store is unavailable
 - **Fallback Values**: Support for default/stale values when loading fails
 
 ## 7. Optimization Considerations
@@ -111,7 +148,7 @@ Map<UserId, UserProfile> profiles = userCache.getAll(userIds);
 ## 8. Monitoring and Management
 
 - **Runtime Statistics**: Hit rate, miss rate, load times, eviction counts
-- **JMX Integration**: Expose metrics and operations via JMX
+- **Metrics Export**: Export cache metrics (hit rate, load latency, eviction count, etc.) to external monitoring systems (e.g., Prometheus) for visualization and alerting.
 - **Manual Control**: APIs for invalidation, clearing, and preloading
 
 ## 9. Limitations and Constraints
